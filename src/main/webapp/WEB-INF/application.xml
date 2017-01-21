@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+    //поиск аннотаций
+    <context:component-scan base-package="ru.inno"/>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    //
+
+    <bean id = "transactionManager" class = "org.springframework.orm.jpa.JpaTransactionManager">
+        <property name = "entityManagerFactory" ref ="emf"/>
+    </bean>
+
+    <bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name = "dataSource" ref="dataSource"/>
+        <property name = "packagesToScan" value="ru.inno.students"/>
+        <property name = "jpaVendorAdapter">
+            <bean class = "org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        </property>>
+
+        <property name = "jpaProperties">
+                <props>
+        <prop key = "hebirnate.archive.autodetection">class</prop>
+                </props>
+        </property>
+
+    </bean>
+
+    <bean id = "dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name = "url"
+        value="jdbc:postgresql://localhost:5432/{database::postgres}"/>
+        <property name = "username" value="postgres"/>
+        <property name="password" value="Termipt91"/>
+        <property name="initialSize" value="10"/>
+        <property name="defaultAutoCommit" value="false"/>
+    </bean>
+
+    <bean id = "sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name = "packagesToScan">
+            <list>
+                <value>ru.inno.students</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.connection.pool_size">10</prop>
+
+                <prop key="hebirnate.dialect"></prop>
+                <prop key="hebirhante.show_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <context:annotation-config/>
+
+    <jpa:repositories base-package="ru.inno.students"
+                      entity-manager-factory-ref="emf"
+                      transaction-manager-ref="transactionManager"/>
+
+</beans>
